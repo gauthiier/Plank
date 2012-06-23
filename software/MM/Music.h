@@ -17,23 +17,66 @@
  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
  
  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- + author: dviid
- + contact: dviid@labs.ciid.dk 
+ + author: Jakob Bak
+ + contact: jakob@sciencefriction.dk 
  */
 
 
+// current sample rate is 15625 as defined in the init() section
+#define SAMPLE_RATE 15625
+
+// Number of oscillators. Set not higher than 4.
+#define NUM_OSCILLATORS 2
+
 class MMusic {    
-    
+public:
     void init();
-        
+	void synthInterrupt();
+	void setFrequency(float frequency);
+	void setFrequency1(float frequency1);
+	void setFrequency2(float frequency2);
+	void setFrequency3(float frequency3);
+	void setDetune(float detune);
+	void setDetune2(float detune);
+	void setDetune3(float detune);
+	void setSawtooth();
+	void setSine();
+	void setGainFloat(float value); // 0.0 - 1.0
+	void setGain16bit(uint16_t value); // 0 - 65535
     
-    // change this 
-    
-    void stop();
-    void start();
-    
-    int         _s; // what ever
-    long        _p; // what everer
+private:
+	// Waveform variables
+	bool sawTooth;
+	
+	//Frequency variable
+	uint16_t period1;
+	uint16_t period2;
+	uint16_t period3;
+	float frequency1;
+	float frequency2;
+	float frequency3;
+	float detune2;
+	float detune3;
+	
+	// variables for oscillator
+	uint16_t accumulator1;
+	uint16_t accumulator2;
+	uint16_t accumulator3;
+	uint16_t index1;
+	uint16_t index2;
+	uint16_t index3;
+	uint16_t oscil1;
+	uint16_t oscil2;
+	uint16_t oscil3;
+	uint16_t gain;
+	
+	// final sample that goes to the DAC    
+	uint32_t sample;
+	
+	// the two bytes that go to the DAC over SPI
+	uint8_t dacSPI0;
+	uint8_t dacSPI1;
+
     
 };
 
