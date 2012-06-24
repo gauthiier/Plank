@@ -146,6 +146,17 @@ void MMusic::setGain16bit(uint16_t value)
 	gain = value;
 }
 
+float MMusic::getGainFloat()
+{
+	return float(gain);
+}
+
+uint16_t MMusic::getGain16bit()
+{
+	return gain;
+}
+
+
 void MMusic::synthInterrupt()
 {
 	// Frame sync low for SPI (making it low here so that we can measure lenght of interrupt with scope)

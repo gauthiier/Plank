@@ -18,7 +18,7 @@
  
  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  + author: Jakob Bak
- + contact: jakob@sciencefriction.dk 
+ + contact: j.bak@ciid.dk
  */
 
 
@@ -43,6 +43,9 @@ public:
 	void setSine();
 	void setGainFloat(float value); // 0.0 - 1.0
 	void setGain16bit(uint16_t value); // 0 - 65535
+	float getGainFloat();
+	uint16_t getGain16bit();
+	
     
 private:
 	// Waveform variables
@@ -65,9 +68,9 @@ private:
 	uint16_t index1;
 	uint16_t index2;
 	uint16_t index3;
-	uint16_t oscil1;
-	uint16_t oscil2;
-	uint16_t oscil3;
+	uint32_t oscil1;
+	uint32_t oscil2;
+	uint32_t oscil3;
 	uint16_t gain;
 	
 	// final sample that goes to the DAC    
