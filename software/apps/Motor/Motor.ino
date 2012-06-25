@@ -1,22 +1,11 @@
-#include <TimerOne.h>
+//#include <TimerOne.h>
 
-/// mOTORS
-const int DIRA = 7;
-const int DIRB = 8;
-const int PWMA = 9;
-const int PWMB = 10;
+#include <Motor.h>
 
 void setup() 
 {
-  pinMode(DIRA, OUTPUT);
-  pinMode(DIRB, OUTPUT);
-  
-  //Timer1.initialize(64);
-  
-  //Timer1.pwm(PWMA, 300);
-  //Timer1.pwm(PWMB, 300);
-  
-  digitalWrite(DIRA, HIGH);
+
+  MotorB.torque(100);  
   
 }
 
@@ -27,12 +16,10 @@ void loop()
   
   if(cnt == 50000) {
     j = -1;
-    digitalWrite(DIRA, HIGH);
-    digitalWrite(DIRB, LOW);
+    MotorB.direction(FORWARD);
   } else if(cnt == 0) {
     j = 1;
-    digitalWrite(DIRA, LOW);
-    digitalWrite(DIRB, HIGH);
+    MotorB.direction(BACKWARD);
   }
   cnt += j;  
   

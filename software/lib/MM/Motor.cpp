@@ -21,61 +21,115 @@
  + contact: dviid@labs.ciid.dk 
  */
 
-#include <avr/io.h>
-
 #include "Motor.h"
+#include <avr/io.h>
 
 #define RESOLUTION 65536
 
-bool reg_init_A = false;
+#define PD7 PORTD7
+#define PB0 PORTB0
+#define PB1 PORTB1
+#define PB2 PORTB2
 
-void MMotor::init(MOTOR m)
+bool reg_init = false;
+
+MMotor MotorA(MOTORA); // this is motor A
+MMotor MotorB(MOTORB); // this is motor B
+
+MMotor::MMotor(MOTOR m)
 {
     _m = m;
+    init();
+}
+
+void MMotor::init()
+{    
     if(!reg_init){
+        
         //PWM, Phase and Frequency
         //Correctthese modes are preferred for motor control applications p.130
         TCCR1A = 0;
         TCCR1B |= (1 << WGM13);
-        _period(64);
+        
+        //direction pins are outputs
+        DDRD |= (1 << PD7);
+        DDRB |= (1 << PB0);
+        
         reg_init = true;
     }
+    
+    //set period for minimal noise            
+    _period(64);
+    
+}
+
+void MMotor::_set_period_bits()
+{
+    // clear prescaler reg
+    TCCR1B &= ~((1 << CS10) | (1 << CS11) | (1 << CS12));
+    
+    if(_p < RESOLUTION)                  TCCR1B |= (1 << CS10);                  // pre-s 0
+    else if((_p >>= 3) < RESOLUTION)     TCCR1B |= (1 << CS11);                  // pre-s 8
+    else if((_p >>= 3) < RESOLUTION)     TCCR1B |= (1 << CS11) | (1 << CS10);    // pre-s 64
+    else if((_p >>= 2) < RESOLUTION)     TCCR1B |= (1 << CS12);                  // pre-s 256
+    else if((_p >>= 2) < RESOLUTION)     TCCR1B |= (1 << CS12) | (1 << CS10);    // pre-s 1024
+    else _p = RESOLUTION - 1,            TCCR1B |= (1 << CS12) | (1 << CS10);    // pre-s 1024
+    
+    ICR1 = _p;
+    
 }
 
 void MMotor::_period(long ms)
 {
-    long c = (F_CPU * ms) / 2000000;
-    
-    // clear prescaler reg
-    TCCR1B &= ~((1 << CS10) | (1 << CS11) | (1 << CS12));
-    
-    if(c < RESOLUTION)                  TCCR1B |= (1 << CS10);                  // pre-s 0
-    else if((c >>= 3) < RESOLUTION)     TCCR1B |= (1 << CS11);                  // pre-s 8
-    else if((c >>= 3) < RESOLUTION)     TCCR1B |= (1 << CS11) | (1 << CS10);    // pre-s 64
-    else if((c >>= 2) < RESOLUTION)     TCCR1B |= (1 << CS12);                  // pre-s 256
-    else if((c >>= 2) < RESOLUTION)     TCCR1B |= (1 << CS12) | (1 << CS10);    // pre-s 1024
-    else c = RESOLUTION - 1,            TCCR1B |= (1 << CS12) | (1 << CS10);    // pre-s 1024
-    
-    // TOP
-    ICR1 = _p = c;
-    
+    _p = (F_CPU * ms) / 2000000;
+    _set_period_bits();
 }
 
-void MMotor::speed(int value) 
+void MMotor::torque(int value) 
 {
     unsigned long duty = _p * value;
     duty >>= 10;
     if(_m == MOTORA) OCR1A = duty;
     else if(_m == MOTORB) OCR1B = duty;    
-    _s = value;
+    _t = value;
+    
+    if(_m == MOTORA) {
+        DDRB |= (1 << PB1);
+        TCCR1A |= (1 << COM1A1);
+    } else if(_m == MOTORB) {
+        DDRB |= (1 << PB2);
+        TCCR1A |= (1 << COM1B1);        
+    }
+    
+    start();
 }
 
-int speed()
+int MMotor::torque()
 {
-    return _s;
+    return _t;
 }
 
 void MMotor::direction(DIRECTION d)
 {
     _d = d;
+    if(_m == MOTORA && _d == FORWARD)           PORTD |= (1 << PD7);
+    else if(_m == MOTORA && _d == BACKWARD)     PORTD &= ~(1 << PD7);
+    else if(_m == MOTORB && _d == BACKWARD)     PORTB |= (1 << PB0);
+    else if(_m == MOTORB && _d == FORWARD)      PORTB &= ~(1 << PB0);    
 }
+
+void MMotor::stop()
+{
+    TCCR1B &= ~((1 << CS10) | (1 << CS11) | (1 << CS12));
+}
+
+void MMotor::start()
+{
+    _set_period_bits();
+}
+
+void MMotor::restart()
+{
+    TCNT1 = 0;
+}
+
