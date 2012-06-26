@@ -46,8 +46,10 @@ public:
 	void setFrequency2(float frequency2);
 	void setFrequency3(float frequency3);
 	void setDetune(float detune);
+	void setDetune1(float detune);
 	void setDetune2(float detune);
 	void setDetune3(float detune);
+	void pitchBend(float b);
 	
 	// WAVEFORM FUNCTIONS
 	void setSine();
@@ -69,10 +71,11 @@ public:
 	uint16_t getGain();
 
 	// NOTE FUNCTIONS
-	void noteOn(uint8_t note, uint8_t vel); // 0 - 255
-	void noteOn(uint8_t note); // 0 - 255
-	void noteOff(uint8_t note); // 0 - 255
+	void noteOn(uint8_t note, uint8_t vel); // 0 - 127
+	void noteOn(uint8_t note); // 0 - 127
+	void noteOff(uint8_t note); // 0 - 127
 	void noteOff();
+	uint16_t getNoteFrequency(uint8_t note); // 0 - 127
 	
 	// ENVELOPE FUNCTIONS
 	void enableEnvelope();
@@ -110,8 +113,10 @@ private:
 	float frequency1;
 	float frequency2;
 	float frequency3;
+	float detune1;
 	float detune2;
 	float detune3;
+	float bend;
 	
 	// OSCILLATOR VARIABLES
 	uint16_t accumulator1;

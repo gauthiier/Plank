@@ -122,9 +122,9 @@ void MMusic::init()
 
 void MMusic::setFrequency(float freq)
 {
-	period1 = uint16_t((freq * 65536.0) / SAMPLE_RATE);
-	period2 = uint16_t(((freq * (1 + detune2)) * 65536.0) / SAMPLE_RATE);
-	period3 = uint16_t(((freq * (1 + detune3)) * 65536.0) / SAMPLE_RATE);
+	period1 = uint16_t(((freq * (1 + detune1 + bend)) * 65536.0) / SAMPLE_RATE);
+	period2 = uint16_t(((freq * (1 + detune2 + bend)) * 65536.0) / SAMPLE_RATE);
+	period3 = uint16_t(((freq * (1 + detune3 + bend)) * 65536.0) / SAMPLE_RATE);
 	frequency = freq;
 	frequency1 = freq;
 	frequency2 = freq;
@@ -134,47 +134,62 @@ void MMusic::setFrequency(float freq)
 
 void MMusic::setFrequency1(float freq)
 {
-	period1 = uint16_t((freq * 65536.0) / SAMPLE_RATE);
+	period1 = uint16_t(((freq * (1 + detune1 + bend)) * 65536.0) / SAMPLE_RATE);
 	frequency1 = freq;
 }
 
 
 void MMusic::setFrequency2(float freq)
 {
-	period2 = uint16_t(((freq * (1 + detune2)) * 65536.0) / SAMPLE_RATE);
+	period2 = uint16_t(((freq * (1 + detune2 + bend)) * 65536.0) / SAMPLE_RATE);
 	frequency2 = freq;
 }
 
 
 void MMusic::setFrequency3(float freq)
 {
-	period3 = uint16_t(((freq * (1 + detune3)) * 65536.0) / SAMPLE_RATE);
+	period3 = uint16_t(((freq * (1 + detune3 + bend)) * 65536.0) / SAMPLE_RATE);
 	frequency3 = freq;
 }
 
 
 void MMusic::setDetune(float detune)
 {
+	detune1 = 0.0;
 	detune2 = detune;
 	detune3 = -detune;
-	period2 = uint16_t(((frequency2 * (1 + detune2)) * 65536.0) / SAMPLE_RATE);
-	period3 = uint16_t(((frequency3 * (1 + detune3)) * 65536.0) / SAMPLE_RATE);
+	period2 = uint16_t(((frequency2 * (1 + detune2 + bend)) * 65536.0) / SAMPLE_RATE);
+	period3 = uint16_t(((frequency3 * (1 + detune3 + bend)) * 65536.0) / SAMPLE_RATE);
+}
+
+
+void MMusic::setDetune1(float detune)
+{
+	detune1 = detune;
+	period1 = uint16_t(((frequency1 * (1 + detune1 + bend)) * 65536.0) / SAMPLE_RATE);
 }
 
 
 void MMusic::setDetune2(float detune)
 {
 	detune2 = detune;
-	period2 = uint16_t(((frequency2 * (1 + detune2)) * 65536.0) / SAMPLE_RATE);
+	period2 = uint16_t(((frequency2 * (1 + detune2 + bend)) * 65536.0) / SAMPLE_RATE);
 }
 
 
 void MMusic::setDetune3(float detune)
 {
 	detune3 = detune;
-	period3 = uint16_t(((frequency3 * (1 + detune3)) * 65536.0) / SAMPLE_RATE);
+	period3 = uint16_t(((frequency3 * (1 + detune3 + bend)) * 65536.0) / SAMPLE_RATE);
 }
 
+void MMusic::pitchBend(float b)
+{
+	bend = b;
+	period1 = uint16_t(((frequency1 * (1 + detune1 + bend)) * 65536.0) / SAMPLE_RATE);
+	period2 = uint16_t(((frequency2 * (1 + detune2 + bend)) * 65536.0) / SAMPLE_RATE);
+	period3 = uint16_t(((frequency3 * (1 + detune3 + bend)) * 65536.0) / SAMPLE_RATE);	
+}
 
 
 
@@ -351,6 +366,14 @@ void MMusic::noteOff()
 	envStage = 4;
 }
 
+
+uint16_t MMusic::getNoteFrequency(uint8_t note)
+{
+	if(note > 127) note = 127;
+	uint16_t freq;
+	memcpy_P(&freq, &hertsTable[note],2);
+	return freq;
+}
 
 
 
