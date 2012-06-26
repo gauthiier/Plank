@@ -87,11 +87,6 @@ void MMotor::_period(long ms)
 
 void MMotor::torque(int value) 
 {
-    unsigned long duty = _p * value;
-    duty >>= 10;
-    if(_m == MOTORA) OCR1A = duty;
-    else if(_m == MOTORB) OCR1B = duty;    
-    _t = value;
     
     if(_m == MOTORA) {
         DDRB |= (1 << PB1);
@@ -100,6 +95,12 @@ void MMotor::torque(int value)
         DDRB |= (1 << PB2);
         TCCR1A |= (1 << COM1B1);        
     }
+    
+    unsigned long duty = _p * value;
+    duty >>= 10;
+    if(_m == MOTORA) OCR1A = duty;
+    else if(_m == MOTORB) OCR1B = duty;    
+    _t = value;    
     
     start();
 }
