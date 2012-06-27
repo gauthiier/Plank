@@ -332,7 +332,7 @@ uint16_t MMusic::getGain()
 void MMusic::noteOn(uint8_t note, uint8_t vel)
 {	
 	envStage = 1;
-	velSustain = vel;
+	velSustain = vel * (sustain/128);
 	notePlayed = note;
 	memcpy_P(&frequency16bit, &hertsTable[notePlayed],2);
 	setFrequency1(frequency16bit);
@@ -344,7 +344,7 @@ void MMusic::noteOn(uint8_t note, uint8_t vel)
 void MMusic::noteOn(uint8_t note)
 {	
 	envStage = 1;
-	velSustain = 127;
+	velSustain = sustain;
 	notePlayed = note;
 	memcpy_P(&frequency16bit, &hertsTable[notePlayed],2);
 	setFrequency1(frequency16bit);
@@ -443,7 +443,7 @@ void MMusic::setDecay(uint8_t dec)
 
 void MMusic::setSustain(uint8_t sus)
 {
-	sustain = ((sus * MAX_ENV_GAIN)/128);	
+	sustain = sus * (MAX_ENV_GAIN/128);	
 }
 
 
