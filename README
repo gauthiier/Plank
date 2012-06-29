@@ -1,3 +1,14 @@
+M&M 
+----
+
 WARNING: WORK IN PROGRESS...
 
 dviid, bill verplank, jakob bak
+
+NOTES / TODO:
+
+1. Review exercices
+ 1.1 Organize exercises - sequence of tutorials (i.e. On/Off, Sensor, On/Off + sensor, etc. )
+ 1.2 Comment proper usage of variables in the code (i.e: MotorA.torque(abs(f)))
+2. Battery Pack
+3. Loud Speakers
